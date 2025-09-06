@@ -9,6 +9,8 @@ import { StudentsPanel } from "@/components/students-panel"
 import { ClassesPanel } from "@/components/classes-panel"
 import { MessageCenter } from "@/components/message-center"
 import { LeftNavRail } from "@/components/left-nav-rail"
+import { useStudents } from "@/hooks/use-students"
+import { useEnrollments } from "@/hooks/use-enrollments"
 
 // Type definitions for fixtures
 interface Student {
@@ -41,11 +43,11 @@ const studentsFixture: Student[] = []
 const classesFixture: Class[] = []
 const messagesFixture: Message[] = []
 
-export default function ParentDashboard() {
+export default function StudentDashboard() {
   const { user, profile, signOut, loading } = useAuth()
   const router = useRouter()
-  const [students, setStudents] = useState(studentsFixture)
-  const [classes, setClasses] = useState(classesFixture)
+  const { students, addStudent, loading: studentsLoading } = useStudents()
+  const { enrollments, createEnrollment, loading: enrollmentsLoading } = useEnrollments()
   const [messages, setMessages] = useState(messagesFixture)
   const [showArchived, setShowArchived] = useState(false)
 
@@ -63,33 +65,54 @@ export default function ParentDashboard() {
       avatar: "/woman-dark-hair.png",
     }, [profile])
 
+  // Transform enrollments to classes format
+  const classes = useMemo(() => 
+    enrollments.map(enrollment => ({
+      id: enrollment.id,
+      name: `${enrollment.instrument} Lessons`,
+      teacher: enrollment.teachers?.profiles ? 
+        `${enrollment.teachers.profiles.first_name} ${enrollment.teachers.profiles.last_name}` : 
+        'Teacher',
+      student: enrollment.students ? 
+        `${enrollment.students.first_name} ${enrollment.students.last_name}` : 
+        'Student',
+      lastUpdate: new Date(enrollment.updated_at).toLocaleDateString()
+    })), [enrollments])
+
+  // Transform students data for StudentsPanel
+  const studentsForPanel = useMemo(() => 
+    students.map(student => ({
+      id: student.id,
+      name: `${student.first_name} ${student.last_name}`,
+      avatar: student.profile_picture_url || 
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/make_him_be_waving_just_waving_1756835489299-viUDIU3Cm4Qdw9BcXS2twEJbeFd7Zt.png",
+      interests: [],
+      activeClasses: enrollments.filter(e => e.student_id === student.id && e.status === 'active').length,
+      modes: []
+    })), [students, enrollments])
+
   useEffect(() => {
     if (!loading && !user) {
       router.push('/')
     }
   }, [user, loading, router])
 
-  const handleAddStudent = (studentData: any) => {
-    const newStudent = {
-      id: Date.now().toString(),
-      ...studentData,
-      avatar:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/make_him_be_waving_just_waving_1756835489299-viUDIU3Cm4Qdw9BcXS2twEJbeFd7Zt.png",
-      activeClasses: 0,
-      modes: [],
-    }
-    setStudents([...students, newStudent])
+  const handleAddStudent = async (studentData: {
+    first_name: string
+    last_name: string
+    date_of_birth?: string
+  }) => {
+    const result = await addStudent(studentData)
+    return result
   }
 
-  const handleJoinClass = (classCode: string) => {
-    const newClass = {
-      id: Date.now().toString(),
-      name: "New Class",
-      teacher: "Teacher Name",
-      student: students[0]?.name || "Student",
-      lastUpdate: new Date().toLocaleDateString(),
-    }
-    setClasses([...classes, newClass])
+  const handleJoinClass = async (teacherId: string, studentId: string, instrument: string) => {
+    await createEnrollment({
+      student_id: studentId,
+      teacher_id: teacherId,
+      instrument: instrument,
+      lesson_type: 'online'
+    })
   }
 
   const handleDeleteMessage = (messageId: string) => {
@@ -158,7 +181,7 @@ export default function ParentDashboard() {
           {/* Row A - Top Panels */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
             <ParentGreetingCard parent={parentData} />
-            <StudentsPanel students={students} onAddStudent={handleAddStudent} />
+            <StudentsPanel students={studentsForPanel} onAddStudent={handleAddStudent} />
             <ClassesPanel
               classes={classes}
               showArchived={showArchived}

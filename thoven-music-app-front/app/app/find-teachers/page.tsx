@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card"
 import { Search, MapPin, Star, Clock, DollarSign, Music, Filter, ChevronLeft } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useAuth } from "@/contexts/auth-context"
+import { useDebounce } from "@/hooks/use-debounce"
 
 interface Teacher {
   id: string
@@ -39,6 +40,9 @@ export default function FindTeachersPage() {
   const [priceRange, setPriceRange] = useState("all")
   const [lessonType, setLessonType] = useState("all")
   const [loading, setLoading] = useState(true)
+  
+  // Debounce search term to avoid excessive filtering
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
   useEffect(() => {
     fetchTeachers()
@@ -46,7 +50,7 @@ export default function FindTeachersPage() {
 
   useEffect(() => {
     filterTeachers()
-  }, [searchTerm, selectedInstrument, priceRange, lessonType, teachers])
+  }, [debouncedSearchTerm, selectedInstrument, priceRange, lessonType, teachers])
 
   const fetchTeachers = async () => {
     try {
