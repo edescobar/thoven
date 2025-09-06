@@ -38,7 +38,6 @@ export default function AuthPage() {
       const result = await signIn(signInData.email, signInData.password)
       
       if (result.error) {
-        console.error('Signin error:', result.error)
         toast({
           title: 'Sign in failed',
           description: result.error,
@@ -49,24 +48,23 @@ export default function AuthPage() {
       }
 
       if (result.user) {
-        console.log('Signin successful, user:', result.user)
-        console.log('Profile:', result.profile)
-        // Get role from profile or user metadata
+        // User is signed in
         const userRole = result.profile?.role || result.user.user_metadata?.role || 'parent'
         
         toast({
           title: 'Welcome back!',
-          description: 'Successfully signed in'
+          description: 'Redirecting to your dashboard...'
         })
         
-        // Redirect based on role
-        if (userRole === 'teacher') {
-          router.push('/app/teacher/dashboard')
-        } else if (userRole === 'parent') {
-          router.push('/app/parent/dashboard')
-        } else {
-          router.push('/app/student/dashboard')
-        }
+        // Small delay to show the toast
+        setTimeout(() => {
+          // Hard redirect based on role
+          if (userRole === 'teacher') {
+            window.location.href = '/app/teacher/dashboard'
+          } else {
+            window.location.href = '/app/parent/dashboard'
+          }
+        }, 1000)
       }
     } catch (error) {
       toast({
@@ -108,7 +106,6 @@ export default function AuthPage() {
       )
       
       if (result.error) {
-        console.error('Signup error:', result.error)
         toast({
           title: 'Sign up failed',
           description: result.error,
@@ -119,24 +116,23 @@ export default function AuthPage() {
       }
 
       if (result.user) {
-        console.log('Signup successful, user:', result.user)
-        console.log('Profile:', result.profile)
-        // Get role from profile or what was selected
+        // Account created and user is automatically signed in
         const userRole = result.profile?.role || (role === 'student' ? 'parent' : 'teacher')
         
         toast({
           title: 'Account created!',
-          description: 'Welcome to Thoven'
+          description: 'You are now logged in. Redirecting...'
         })
         
-        // Redirect based on role
-        if (userRole === 'teacher') {
-          router.push('/app/teacher/dashboard')
-        } else if (userRole === 'parent') {
-          router.push('/app/parent/dashboard')
-        } else {
-          router.push('/app/student/dashboard')
-        }
+        // Small delay to show the toast
+        setTimeout(() => {
+          // Redirect based on role
+          if (userRole === 'teacher') {
+            window.location.href = '/app/teacher/dashboard'
+          } else {
+            window.location.href = '/app/parent/dashboard'
+          }
+        }, 1000)
       }
     } catch (error) {
       toast({
