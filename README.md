@@ -2,6 +2,27 @@
 
 A modern web application connecting students with qualified music teachers for online and in-person lessons.
 
+## 🚨 CRITICAL: Vercel Environment Variables Setup
+
+**The authentication will NOT work without these environment variables on Vercel!**
+
+### Required Environment Variables:
+1. Go to your Vercel project: https://vercel.com/dashboard
+2. Select the `thoven-music-app` project
+3. Go to Settings → Environment Variables
+4. Add these variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`: `https://gswgawmeyifchjshbajd.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: (Get from Supabase - see below)
+
+### Getting your Supabase Anon Key:
+1. Go to https://supabase.com/dashboard/project/gswgawmeyifchjshbajd/settings/api
+2. In the "Project API keys" section, copy the `anon` `public` key
+3. Paste it as the value for `NEXT_PUBLIC_SUPABASE_ANON_KEY` in Vercel
+
+### After Adding Variables:
+- Redeploy your project in Vercel for the changes to take effect
+- You can trigger a redeployment from the Deployments tab
+
 ## Project Structure
 
 ```
