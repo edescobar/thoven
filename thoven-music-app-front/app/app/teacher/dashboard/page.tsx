@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { useTeacherProfile } from '@/hooks/use-teacher-profile'
 import { useTeacherStudents } from '@/hooks/use-teacher-students'
 import { Switch } from '@/components/ui/switch'
+import { BookingRequestsPanel } from '@/components/booking-requests-panel'
 import {
   Select,
   SelectContent,
@@ -215,13 +216,19 @@ export default function TeacherDashboard() {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="students" className="space-y-4">
+        <Tabs defaultValue="requests" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="requests">Requests</TabsTrigger>
             <TabsTrigger value="students">Students</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
           </TabsList>
+
+          {/* Requests Tab */}
+          <TabsContent value="requests" className="space-y-4">
+            <BookingRequestsPanel />
+          </TabsContent>
 
           {/* Students Tab */}
           <TabsContent value="students" className="space-y-4">

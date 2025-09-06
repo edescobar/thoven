@@ -34,26 +34,6 @@ export const LazyLearnerLanding = dynamic(
   { loading: () => <LoadingSpinner />, ssr: false }
 )
 
-// Lazy load heavy page sections
-export const LazyTeacherDashboardTabs = dynamic(
-  () => import('@/components/teacher-dashboard-tabs'),
-  { loading: () => <LoadingSpinner />, ssr: false }
-)
-
-// Lazy load authentication components
-export const LazyAuthForm = dynamic(
-  () => import('@/components/auth-form').then(mod => ({ default: mod.AuthForm })),
-  { loading: () => <LoadingSpinner />, ssr: false }
-)
-
-// Lazy load dashboard components
-export const LazyDashboard = dynamic(
-  () => import('@/components/dashboard'),
-  { loading: () => <LoadingSpinner />, ssr: false }
-)
-
-// Lazy load find teachers page
-export const LazyFindTeachers = dynamic(
-  () => import('@/app/app/find-teachers/page'),
-  { loading: () => <LoadingSpinner />, ssr: false }
-)
+// Note: Removed unused lazy imports for non-existent components
+// (teacher-dashboard-tabs, auth-form, dashboard)
+// These can be re-added when the components are created
