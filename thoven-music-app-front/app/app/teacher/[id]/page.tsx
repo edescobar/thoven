@@ -37,10 +37,12 @@ interface TeacherProfile {
 export default function TeacherProfilePage() {
   const router = useRouter()
   const params = useParams()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const { toast } = useToast()
   const [teacher, setTeacher] = useState<TeacherProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedTab, setSelectedTab] = useState('about')
+  const [showBookingModal, setShowBookingModal] = useState(false)
 
   useEffect(() => {
     if (params.id) {
@@ -333,7 +335,27 @@ export default function TeacherProfilePage() {
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+                <Button 
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+                  onClick={() => {
+                    if (!user) {
+                      toast({
+                        title: "Sign in required",
+                        description: "Please sign in to book a lesson",
+                        variant: "destructive"
+                      })
+                      router.push('/auth')
+                    } else if (profile?.role !== 'parent') {
+                      toast({
+                        title: "Parent account required",
+                        description: "Only parents can book lessons for their children",
+                        variant: "destructive"
+                      })
+                    } else {
+                      setShowBookingModal(true)
+                    }
+                  }}
+                >
                   <Calendar className="w-4 h-4 mr-2" />
                   Book a Lesson
                 </Button>
@@ -369,6 +391,23 @@ export default function TeacherProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {teacher && (
+        <BookingModal
+          isOpen={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          teacher={{
+            id: teacher.id,
+            name: `${teacher.first_name} ${teacher.last_name}`,
+            instruments: teacher.teachers?.instruments_taught || [],
+            hourly_rate: teacher.teachers?.hourly_rate || 50,
+            online_lessons: teacher.teachers?.online_lessons || false,
+            in_person_lessons: teacher.teachers?.in_person_lessons || false
+          }}
+          parentId={profile?.id || ''}
+        />
+      )}
     </div>
   )
 }
