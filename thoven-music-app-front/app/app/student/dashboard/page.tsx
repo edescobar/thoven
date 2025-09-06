@@ -9,7 +9,6 @@ import { StudentsPanel } from "@/components/students-panel"
 import { ClassesPanel } from "@/components/classes-panel"
 import { MessageCenter } from "@/components/message-center"
 import { LeftNavRail } from "@/components/left-nav-rail"
-import { TeacherDiscoveryCTA } from "@/components/teacher-discovery-cta"
 
 // Type definitions for fixtures
 interface Student {
@@ -155,7 +154,6 @@ export default function ParentDashboard() {
         {/* Main Content - Responsive margins */}
         <main className="flex-1 p-4 md:p-6 md:ml-64">
           {/* Teacher Discovery CTA */}
-          <TeacherDiscoveryCTA hasStudents={students.length > 0} />
 
           {/* Row A - Top Panels */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
