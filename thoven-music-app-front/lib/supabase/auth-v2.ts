@@ -259,3 +259,18 @@ export const authService = {
     })
   }
 }
+
+// Standalone functions for auth page
+export async function signIn(email: string, password: string) {
+  return authService.signIn({ email, password })
+}
+
+export async function signUp(email: string, password: string, firstName: string = '', lastName: string = '', role: 'parent' | 'teacher' = 'parent') {
+  return authService.signUp({
+    email,
+    password,
+    first_name: firstName,
+    last_name: lastName,
+    role
+  })
+}

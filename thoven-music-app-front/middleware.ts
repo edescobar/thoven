@@ -27,20 +27,40 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Log middleware activity
-  console.log(`[Middleware] Path: ${req.nextUrl.pathname}, Session: ${session ? 'Yes' : 'No'}`)
+  const pathname = req.nextUrl.pathname
+
+  // Allow access to auth page
+  if (pathname === '/auth') {
+    // If already logged in, redirect to appropriate dashboard
+    if (session) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+
+      if (profile) {
+        if (profile.role === 'parent' || profile.role === 'student') {
+          return NextResponse.redirect(new URL('/app/student/dashboard', req.url))
+        } else if (profile.role === 'teacher') {
+          return NextResponse.redirect(new URL('/app/teacher/dashboard', req.url))
+        }
+      }
+      return NextResponse.redirect(new URL('/app/dashboard', req.url))
+    }
+    return res
+  }
 
   // Protected routes - everything under /app
-  const isProtectedPath = req.nextUrl.pathname.startsWith('/app')
+  const isProtectedPath = pathname.startsWith('/app')
 
   if (isProtectedPath && !session) {
-    console.log('[Middleware] Redirecting to login - no session')
-    // Redirect to home page if trying to access protected route without session
-    return NextResponse.redirect(new URL('/', req.url))
+    // Redirect to auth page if trying to access protected route without session
+    return NextResponse.redirect(new URL('/auth', req.url))
   }
 
   // If user is logged in and hits /app root, redirect based on role
-  if (session && req.nextUrl.pathname === '/app') {
+  if (session && pathname === '/app') {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -48,8 +68,8 @@ export async function middleware(req: NextRequest) {
       .single()
 
     if (profile) {
-      if (profile.role === 'parent') {
-        return NextResponse.redirect(new URL('/app/parent/dashboard', req.url))
+      if (profile.role === 'parent' || profile.role === 'student') {
+        return NextResponse.redirect(new URL('/app/student/dashboard', req.url))
       } else if (profile.role === 'teacher') {
         return NextResponse.redirect(new URL('/app/teacher/dashboard', req.url))
       }
@@ -62,5 +82,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/app/:path*']
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',]
 }
