@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd thoven-music-app-front && npm run build",
+  "outputDirectory": "thoven-music-app-front/.next",
+  "installCommand": "cd thoven-music-app-front && npm install",
+  "devCommand": "cd thoven-music-app-front && npm run dev",
+  "framework": null
+}
