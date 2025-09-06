@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { memo } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,7 +11,7 @@ import { useState, useEffect } from "react"
 import { Play } from "lucide-react"
 import { TeacherApplication } from "./teacher-application"
 
-export function TeacherLanding() {
+const TeacherLandingComponent = () => {
   const [hours, setHours] = useState([10])
   const [income, setIncome] = useState(0)
   const [showDemoForm, setShowDemoForm] = useState(false)
@@ -519,3 +520,5 @@ export function TeacherLanding() {
     </div>
   )
 }
+
+export const TeacherLanding = memo(TeacherLandingComponent)

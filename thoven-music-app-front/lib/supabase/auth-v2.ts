@@ -15,8 +15,6 @@ export interface SignInData {
 
 export const authService = {
   async signUp(data: SignUpData) {
-    console.log('🔐 Starting signup process for:', data.email)
-    
     try {
       // Step 1: Create the user account
       const { data: signUpResult, error: signUpError } = await supabase.auth.signUp({
@@ -33,15 +31,12 @@ export const authService = {
       })
 
       if (signUpError) {
-        console.error('❌ Signup error:', signUpError)
         throw signUpError
       }
 
       if (!signUpResult.user) {
         throw new Error('No user returned from signup')
       }
-
-      console.log('✅ User created:', signUpResult.user.id)
 
       // Step 2: Wait a moment for the database trigger to create the profile
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -53,11 +48,8 @@ export const authService = {
       })
 
       if (signInError) {
-        console.error('❌ Auto-signin error:', signInError)
         throw signInError
       }
-
-      console.log('✅ User signed in:', signInResult.session?.user.id)
 
       // Step 4: Get the profile (with retry logic and fallback creation)
       let profile = null
@@ -72,9 +64,7 @@ export const authService = {
         
         if (profileData) {
           profile = profileData
-          console.log('✅ Profile found:', profile)
         } else {
-          console.log(`⏳ Profile not ready, retrying... (${retries} attempts left)`)
           await new Promise(resolve => setTimeout(resolve, 1000))
           retries--
         }
@@ -82,7 +72,6 @@ export const authService = {
       
       // If profile still doesn't exist, create it manually
       if (!profile && signUpResult.user) {
-        console.log('📝 Creating profile manually...')
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert({
@@ -95,11 +84,8 @@ export const authService = {
           .select()
           .single()
         
-        if (createError) {
-          console.error('❌ Manual profile creation failed:', createError)
-        } else {
+        if (!createError && newProfile) {
           profile = newProfile
-          console.log('✅ Profile created manually:', profile)
         }
       }
 
@@ -113,11 +99,7 @@ export const authService = {
             verified: false
           })
         
-        if (teacherError && !teacherError.message.includes('duplicate')) {
-          console.error('⚠️ Teacher record creation issue:', teacherError)
-        } else {
-          console.log('✅ Teacher record created')
-        }
+        // Teacher record created or already exists
       }
 
       return { 
@@ -127,7 +109,6 @@ export const authService = {
         error: null 
       }
     } catch (error: any) {
-      console.error('❌ Signup process failed:', error)
       return { 
         user: null, 
         profile: null,
@@ -138,8 +119,6 @@ export const authService = {
   },
 
   async signIn(data: SignInData) {
-    console.log('🔐 Starting signin for:', data.email)
-    
     try {
       // Sign in the user
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -148,15 +127,12 @@ export const authService = {
       })
 
       if (authError) {
-        console.error('❌ Signin error:', authError)
         throw authError
       }
 
       if (!authData.user) {
         throw new Error('No user returned from signin')
       }
-
-      console.log('✅ User authenticated:', authData.user.id)
 
       // Get the user's profile (with fallback creation if missing)
       let profile = null
@@ -168,7 +144,6 @@ export const authService = {
 
       if (profileError && profileError.code === 'PGRST116') {
         // Profile doesn't exist, create it from auth metadata
-        console.log('📝 Profile missing, creating from auth metadata...')
         const { data: userData } = await supabase.auth.getUser()
         const metadata = userData?.user?.user_metadata || {}
         
@@ -184,17 +159,11 @@ export const authService = {
           .select()
           .single()
         
-        if (createError) {
-          console.error('❌ Profile creation failed:', createError)
-        } else {
+        if (!createError && newProfile) {
           profile = newProfile
-          console.log('✅ Profile created:', profile)
         }
       } else if (profileData) {
         profile = profileData
-        console.log('✅ Profile loaded:', profile)
-      } else {
-        console.error('⚠️ Profile fetch error:', profileError)
       }
 
       return { 
@@ -204,7 +173,6 @@ export const authService = {
         error: null 
       }
     } catch (error: any) {
-      console.error('❌ Signin failed:', error)
       return { 
         user: null, 
         profile: null, 
@@ -215,13 +183,7 @@ export const authService = {
   },
 
   async signOut() {
-    console.log('🔐 Signing out...')
     const { error } = await supabase.auth.signOut()
-    if (error) {
-      console.error('❌ Signout error:', error)
-    } else {
-      console.log('✅ Signed out successfully')
-    }
     return { error }
   },
 
@@ -229,7 +191,6 @@ export const authService = {
     const { data: { user }, error } = await supabase.auth.getUser()
     
     if (error || !user) {
-      console.log('ℹ️ No authenticated user')
       return null
     }
 
@@ -239,24 +200,19 @@ export const authService = {
       .eq('id', user.id)
       .single()
 
-    console.log('ℹ️ Current user:', user.email, 'Profile:', profile?.role)
     return { user, profile }
   },
 
   async getSession() {
     const { data: { session }, error } = await supabase.auth.getSession()
     if (error) {
-      console.error('❌ Session error:', error)
       return null
     }
     return session
   },
 
   onAuthStateChange(callback: (event: any, session: any) => void) {
-    return supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔄 Auth state changed:', event, session?.user?.email)
-      callback(event, session)
-    })
+    return supabase.auth.onAuthStateChange(callback)
   }
 }
 
