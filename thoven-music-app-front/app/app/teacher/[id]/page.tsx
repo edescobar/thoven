@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card"
 import { ChevronLeft, MapPin, Star, Clock, DollarSign, Calendar, MessageCircle, CheckCircle, Music, Video, Users, Award } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useAuth } from "@/contexts/auth-context"
+import { BookingModal } from "@/components/booking-modal"
+import { useToast } from "@/hooks/use-toast"
 
 interface TeacherProfile {
   id: string

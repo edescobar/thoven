@@ -10,6 +10,7 @@ import { Search, MapPin, Star, Clock, DollarSign, Music, Filter, ChevronLeft } f
 import { supabase } from "@/lib/supabase/client"
 import { useAuth } from "@/contexts/auth-context"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCachedData } from "@/hooks/use-cached-data"
 
 interface Teacher {
   id: string
@@ -33,27 +34,19 @@ interface Teacher {
 export default function FindTeachersPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const [teachers, setTeachers] = useState<Teacher[]>([])
   const [filteredTeachers, setFilteredTeachers] = useState<Teacher[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedInstrument, setSelectedInstrument] = useState("all")
   const [priceRange, setPriceRange] = useState("all")
   const [lessonType, setLessonType] = useState("all")
-  const [loading, setLoading] = useState(true)
   
   // Debounce search term to avoid excessive filtering
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
-
-  useEffect(() => {
-    fetchTeachers()
-  }, [])
-
-  useEffect(() => {
-    filterTeachers()
-  }, [debouncedSearchTerm, selectedInstrument, priceRange, lessonType, teachers])
-
-  const fetchTeachers = async () => {
-    try {
+  
+  // Use cached data hook for teachers
+  const { data: teachers = [], isLoading: loading } = useCachedData<Teacher[]>({
+    key: ['teachers', 'active'],
+    fetcher: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -62,19 +55,24 @@ export default function FindTeachersPage() {
         `)
         .eq('role', 'teacher')
         .eq('teachers.is_active', true)
-
+      
       if (error) throw error
-      setTeachers(data || [])
-      setFilteredTeachers(data || [])
-    } catch (error) {
-      console.error('Error fetching teachers:', error)
-      // No mock data - only show real teachers
-      setTeachers([])
-      setFilteredTeachers([])
-    } finally {
-      setLoading(false)
+      return data || []
+    },
+    ttl: 2 * 60 * 1000, // Cache for 2 minutes
+    revalidateOnFocus: true
+  })
+
+  useEffect(() => {
+    filterTeachers()
+  }, [debouncedSearchTerm, selectedInstrument, priceRange, lessonType, teachers])
+  
+  useEffect(() => {
+    // Set initial filtered teachers when data loads
+    if (teachers.length > 0 && filteredTeachers.length === 0) {
+      setFilteredTeachers(teachers)
     }
-  }
+  }, [teachers])
 
   const filterTeachers = useCallback(() => {
     let filtered = [...teachers]
