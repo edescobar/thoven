@@ -47,20 +47,22 @@ export default function AuthPage() {
       }
 
       if (result.user) {
-        const userRole = result.user.user_metadata?.role || 'student'
-        
-        if (userRole === 'teacher') {
-          router.push('/app/teacher/dashboard')
-        } else if (userRole === 'parent') {
-          router.push('/app/parent/dashboard')
-        } else {
-          router.push('/app/dashboard')
-        }
+        // Get role from profile or user metadata
+        const userRole = result.profile?.role || result.user.user_metadata?.role || 'parent'
         
         toast({
           title: 'Welcome back!',
           description: 'Successfully signed in'
         })
+        
+        // Redirect based on role
+        if (userRole === 'teacher') {
+          router.push('/app/teacher/dashboard')
+        } else if (userRole === 'parent') {
+          router.push('/app/parent/dashboard')
+        } else {
+          router.push('/app/student/dashboard')
+        }
       }
     } catch (error) {
       toast({
