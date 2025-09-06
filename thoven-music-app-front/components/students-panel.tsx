@@ -16,7 +16,11 @@ interface Student {
 
 interface StudentsPanelProps {
   students: Student[]
-  onAddStudent: (studentData: any) => void
+  onAddStudent: (studentData: {
+    first_name: string
+    last_name: string
+    date_of_birth?: string
+  }) => Promise<{ data: any; error: string | null }> | void
 }
 
 export function StudentsPanel({ students, onAddStudent }: StudentsPanelProps) {

@@ -52,9 +52,10 @@ export function SignInModal({ isOpen, onClose, onSignUpClick }: SignInModalProps
         
         // Small delay to ensure state updates
         setTimeout(() => {
-          if (result.profile?.role === 'parent') {
+          const profile = result.profile as { role?: string } | undefined
+          if (profile?.role === 'parent') {
             router.push("/app/parent/dashboard")
-          } else if (result.profile?.role === 'teacher') {
+          } else if (profile?.role === 'teacher') {
             router.push("/app/teacher/dashboard")
           } else {
             router.push("/app/dashboard")

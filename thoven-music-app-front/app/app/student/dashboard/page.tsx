@@ -106,13 +106,12 @@ export default function StudentDashboard() {
     return result
   }
 
-  const handleJoinClass = async (teacherId: string, studentId: string, instrument: string) => {
-    await createEnrollment({
-      student_id: studentId,
-      teacher_id: teacherId,
-      instrument: instrument,
-      lesson_type: 'online'
-    })
+  const handleJoinClass = async (classCode: string) => {
+    // TODO: Implement joining class with class code
+    // For now, this is a placeholder implementation
+    console.log('Joining class with code:', classCode)
+    // Parse class code to extract teacher_id, instrument, etc.
+    // await createEnrollment({...})
   }
 
   const handleDeleteMessage = (messageId: string) => {

@@ -9,8 +9,8 @@ const LoadingSpinner = () => (
 )
 
 // Lazy load heavy components
-export const LazyChart = dynamic(
-  () => import('@/components/ui/chart').then(mod => ({ default: mod.Chart })),
+export const LazyChartContainer = dynamic(
+  () => import('@/components/ui/chart').then(mod => ({ default: mod.ChartContainer })),
   { loading: () => <LoadingSpinner />, ssr: false }
 )
 
@@ -20,7 +20,7 @@ export const LazyCalendar = dynamic(
 )
 
 export const LazyTeacherApplication = dynamic(
-  () => import('@/components/teacher-application'),
+  () => import('@/components/teacher-application').then(mod => ({ default: mod.TeacherApplication })),
   { loading: () => <LoadingSpinner />, ssr: false }
 )
 
@@ -30,7 +30,7 @@ export const LazyTeacherLanding = dynamic(
 )
 
 export const LazyLearnerLanding = dynamic(
-  () => import('@/components/learner-landing'),
+  () => import('@/components/learner-landing').then(mod => ({ default: mod.LearnerLanding })),
   { loading: () => <LoadingSpinner />, ssr: false }
 )
 

@@ -1,0 +1,21 @@
+{
+  "name": "Thoven Music Education",
+  "short_name": "Thoven",
+  "description": "Connect with expert music teachers for personalized 1-on-1 lessons",
+  "theme_color": "#f59e0b",
+  "background_color": "#fef3c7",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "music"],
+  "lang": "en"
+}

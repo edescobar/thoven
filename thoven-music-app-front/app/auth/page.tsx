@@ -88,10 +88,16 @@ export default function AuthPage() {
     setIsLoading(true)
 
     try {
+      // Parse name into first and last name
+      const nameParts = signUpData.name.trim().split(' ')
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || ''
+      
       const result = await signUp(
         signUpData.email,
         signUpData.password,
-        signUpData.name,
+        firstName,
+        lastName,
         role === 'student' ? 'parent' : 'teacher'
       )
       

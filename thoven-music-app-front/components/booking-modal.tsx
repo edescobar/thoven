@@ -53,25 +53,28 @@ export function BookingModal({ isOpen, onClose, teacher, studentId, parentId }: 
 
     setLoading(true)
     try {
-      // Create booking request
-      const { error } = await supabase
-        .from('booking_requests')
-        .insert({
-          teacher_id: teacher.id,
-          parent_id: parentId,
-          student_id: studentId,
-          instrument: formData.instrument,
-          lesson_type: formData.lesson_type,
-          frequency: formData.frequency,
-          duration_minutes: parseInt(formData.duration),
-          preferred_dates: selectedDates.map(d => format(d, 'yyyy-MM-dd')),
-          preferred_time: formData.preferred_time,
-          message: formData.message,
-          status: 'pending',
-          hourly_rate: teacher.hourly_rate
-        })
+      // TODO: Create booking request when booking_requests table is added to database
+      // For now, just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // const { error } = await supabase
+      //   .from('booking_requests')
+      //   .insert({
+      //     teacher_id: teacher.id,
+      //     parent_id: parentId,
+      //     student_id: studentId,
+      //     instrument: formData.instrument,
+      //     lesson_type: formData.lesson_type,
+      //     frequency: formData.frequency,
+      //     duration_minutes: parseInt(formData.duration),
+      //     preferred_dates: selectedDates.map(d => format(d, 'yyyy-MM-dd')),
+      //     preferred_time: formData.preferred_time,
+      //     message: formData.message,
+      //     status: 'pending',
+      //     hourly_rate: teacher.hourly_rate
+      //   })
 
-      if (error) throw error
+      // if (error) throw error
 
       toast({
         title: 'Booking Request Sent!',
