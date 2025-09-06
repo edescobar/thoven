@@ -182,13 +182,12 @@ export function SignInModal({ isOpen, onClose, onSignUpClick }: SignInModalProps
 
             {/* Forgot Password Link */}
             <div className="text-left">
-              <button
-                type="button"
+              <a
+                href="/auth/reset-password"
                 className="text-sm text-amber-600 hover:text-amber-700 hover:underline font-sans"
-                onClick={() => console.log("[v0] Open forgot password")}
               >
                 Forgot Password?
-              </button>
+              </a>
             </div>
 
             {/* Sign In Button */}
