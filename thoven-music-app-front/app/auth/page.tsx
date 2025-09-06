@@ -137,7 +137,7 @@ export default function AuthPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">Welcome to Thoven</CardTitle>
           <CardDescription>
-            Sign in to your account or create a new one
+            Sign in to your account or create a new one to get started
           </CardDescription>
         </CardHeader>
         <CardContent>
