@@ -38,15 +38,19 @@ export default function AuthPage() {
       const result = await signIn(signInData.email, signInData.password)
       
       if (result.error) {
+        console.error('Signin error:', result.error)
         toast({
           title: 'Sign in failed',
           description: result.error,
           variant: 'destructive'
         })
+        setIsLoading(false)
         return
       }
 
       if (result.user) {
+        console.log('Signin successful, user:', result.user)
+        console.log('Profile:', result.profile)
         // Get role from profile or user metadata
         const userRole = result.profile?.role || result.user.user_metadata?.role || 'parent'
         
@@ -104,29 +108,35 @@ export default function AuthPage() {
       )
       
       if (result.error) {
+        console.error('Signup error:', result.error)
         toast({
           title: 'Sign up failed',
           description: result.error,
           variant: 'destructive'
         })
+        setIsLoading(false)
         return
       }
 
       if (result.user) {
-        const userRole = result.user.user_metadata?.role || 'student'
-        
-        if (userRole === 'teacher') {
-          router.push('/app/teacher/dashboard')
-        } else if (userRole === 'parent') {
-          router.push('/app/parent/dashboard')
-        } else {
-          router.push('/app/dashboard')
-        }
+        console.log('Signup successful, user:', result.user)
+        console.log('Profile:', result.profile)
+        // Get role from profile or what was selected
+        const userRole = result.profile?.role || (role === 'student' ? 'parent' : 'teacher')
         
         toast({
           title: 'Account created!',
           description: 'Welcome to Thoven'
         })
+        
+        // Redirect based on role
+        if (userRole === 'teacher') {
+          router.push('/app/teacher/dashboard')
+        } else if (userRole === 'parent') {
+          router.push('/app/parent/dashboard')
+        } else {
+          router.push('/app/student/dashboard')
+        }
       }
     } catch (error) {
       toast({
