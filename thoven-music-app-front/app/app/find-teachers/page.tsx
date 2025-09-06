@@ -79,12 +79,12 @@ export default function FindTeachersPage() {
   const filterTeachers = useCallback(() => {
     let filtered = [...teachers]
 
-    // Search filter
-    if (searchTerm) {
+    // Search filter with debounced term
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(teacher => 
-        `${teacher.first_name} ${teacher.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.teachers?.instruments_taught?.some(i => i.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        teacher.city?.toLowerCase().includes(searchTerm.toLowerCase())
+        `${teacher.first_name} ${teacher.last_name}`.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        teacher.teachers?.instruments_taught?.some(i => i.toLowerCase().includes(debouncedSearchTerm.toLowerCase())) ||
+        teacher.city?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       )
     }
 
@@ -118,7 +118,7 @@ export default function FindTeachersPage() {
     }
 
     setFilteredTeachers(filtered)
-  }, [searchTerm, selectedInstrument, priceRange, lessonType, teachers])
+  }, [debouncedSearchTerm, selectedInstrument, priceRange, lessonType, teachers])
 
   const allInstruments = useMemo(() => 
     Array.from(new Set(

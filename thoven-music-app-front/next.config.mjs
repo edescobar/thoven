@@ -22,7 +22,7 @@ const nextConfig = {
   
   // Build optimizations
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ['@radix-ui/react-*', 'lucide-react'],
   },
   
